@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 /// Generic Algorithm in Rust
-use crate::error::GaError;
-use crate::GaResult;
+use self::error::GaError;
 use std::fmt::Debug;
 pub trait Individual: Clone + Debug {
     // generate valid rand individual
@@ -175,5 +174,5 @@ where
         }
     }
 }
-
+mod error;
 pub type GaResult<T> = std::result::Result<T, error::GaError>;

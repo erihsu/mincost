@@ -85,5 +85,5 @@ impl<S: Solution> Annealer<S> {
         Ok(self.state.solution.clone())
     }
 }
-
-pub type SaResult<T> = std::result::Result<T, error::SaError>;
+mod error;
+pub type SaResult<T> = std::result::Result<T, self::error::SaError>;
