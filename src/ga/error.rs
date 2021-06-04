@@ -6,8 +6,8 @@ pub enum GaError {
     BreedBeforeSelection,
     #[error("Population must be breed before mutate")]
     MutateBeforeBreed,
-    #[error("Best Individuals Not generated")]
-    BestIndividualNotReady,
+    #[error("Best DeciIndividuals Not generated")]
+    BestDeciIndividualNotReady,
     #[error("Failed to parse ga config")]
     InvalidGaConfig {
         #[from]

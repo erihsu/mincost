@@ -1,6 +1,5 @@
 #![allow(dead_code)]
-use crate::SaResult;
-/// Generic Algorithm in Rust
+/// Simulated Annealing Algorithm in Rust
 use std::fmt::Debug;
 
 pub trait Solution: Clone + Debug {

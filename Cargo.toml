@@ -9,7 +9,7 @@ rand = "0.8"
 thiserror = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.8"
-
+num-traits = "0.2"
 
 [features]
 ga = []
@@ -17,5 +17,6 @@ sa = []
 
 [workspace]
 members = [
-	"examples/ga_example"
+	"examples/ga_examples/bounded_decimal_encoding",
+	"examples/ga_examples/binary_encoding",
 ]
