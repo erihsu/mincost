@@ -1,6 +1,4 @@
-use mincost::Individual;
-
-use mincost::Evolution;
+use mincost::{Evolution, EvolutionConfig, Individual};
 fn main() {
     // define Fitness as well as encoding type.
     // In this example, encoding type is Boolean
@@ -11,8 +9,16 @@ fn main() {
             acc + score
         })
     };
-
-    let mut evolution = Evolution::init("config.yml", fitness).unwrap();
+    let evolution_config = EvolutionConfig {
+        pop_size: 100,
+        elite_size: 20,
+        mutation_rate: 0.4,
+        generations: 10,
+        individual_length: 5,
+        upper: None,
+        lower: None,
+    };
+    let mut evolution = Evolution::init(evolution_config, fitness).unwrap();
     let best_ind = evolution.evolute().unwrap();
     println!("Best Individual {:?}", best_ind);
 }

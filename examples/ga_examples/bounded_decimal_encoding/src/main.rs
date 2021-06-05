@@ -1,5 +1,4 @@
-use mincost::Evolution;
-use mincost::Individual;
+use mincost::{Evolution, EvolutionConfig, Individual};
 
 fn main() {
     let fitness = |solution: &Individual<i32>| -> f32 {
@@ -10,8 +9,16 @@ fn main() {
         });
         sum as f32
     };
-
-    let mut evolution = Evolution::init_with_range("config.yml", fitness).unwrap();
+    let evolution_config = EvolutionConfig {
+        pop_size: 100,
+        elite_size: 20,
+        mutation_rate: 0.1,
+        generations: 20,
+        individual_length: 10,
+        upper: Some(100),
+        lower: Some(200),
+    };
+    let mut evolution = Evolution::init_with_range(evolution_config, fitness).unwrap();
     let best_ind = evolution.evolute().unwrap();
     println!("Best DeciIndividual {:?}", best_ind);
 }

@@ -8,37 +8,34 @@ use rand::prelude::Distribution;
 use rand::{thread_rng, Rng};
 use std::fmt::Debug;
 
+pub type GaResult<T> = std::result::Result<T, error::GaError>;
+
 #[derive(Clone, Debug)]
 pub struct Individual<T> {
     pub genes: Vec<T>,
+}
+
+pub struct Evolution<T, F> {
+    config: EvolutionConfig<T>,
+    population: Population<T>,
+    fitness: F,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct EvolutionConfig<T> {
+    pub pop_size: usize,
+    pub elite_size: usize,
+    pub mutation_rate: f32,
+    pub generations: usize,
+    pub individual_length: usize,
+    pub upper: Option<T>,
+    pub lower: Option<T>,
 }
 
 impl<T> Individual<T>
 where
     T: Copy + Debug,
 {
-    fn rand_with_bound(length: usize, upper: T, lower: T) -> Self
-    where
-        Standard: Distribution<T>,
-        T: SampleUniform + PartialOrd,
-    {
-        let mut rng = thread_rng();
-        let mut genes = Vec::with_capacity(length);
-        for _ in 0..length {
-            genes.push(rng.gen_range(lower..upper));
-        }
-        Individual { genes }
-    }
-    fn rand(length: usize) -> Self
-    where
-        Standard: Distribution<T>,
-    {
-        let mut genes = Vec::with_capacity(length);
-        for _ in 0..length {
-            genes.push(rand::random::<T>());
-        }
-        Individual { genes }
-    }
     fn breed(&self, another: &Self) -> Self {
         let mut rng = thread_rng();
         let idx1: usize = rng.gen_range(0..self.genes.len());
@@ -75,28 +72,17 @@ enum PopulationStatus {
     Mutated,
 }
 
-pub struct Evolution<T, F> {
-    config: EvolutionConfig<T>,
-    population: Population<T>,
-    fitness: F,
-}
-
-use std::fs;
-use std::path::Path;
-
 impl<T, F, O> Evolution<T, F>
 where
     F: Fn(&Individual<T>) -> O,
     O: PartialOrd + Into<f64>,
     T: Copy + Debug,
 {
-    pub fn init<P: AsRef<Path>>(config_path: P, fitness: F) -> GaResult<Self>
+    pub fn init(config: EvolutionConfig<T>, fitness: F) -> GaResult<Self>
     where
-        T: serde::de::DeserializeOwned + PartialOrd,
+        T: PartialOrd,
         Standard: Distribution<T>,
     {
-        let cfg_str: String = fs::read_to_string(config_path)?;
-        let config: EvolutionConfig<T> = serde_yaml::from_str(&cfg_str)?;
         let population =
             Population::initial_without_range(config.pop_size, config.individual_length);
         Ok(Evolution {
@@ -105,13 +91,11 @@ where
             fitness,
         })
     }
-    pub fn init_with_range<P: AsRef<Path>>(config_path: P, fitness: F) -> GaResult<Self>
+    pub fn init_with_range(config: EvolutionConfig<T>, fitness: F) -> GaResult<Self>
     where
-        T: serde::de::DeserializeOwned + PartialOrd + SampleUniform,
+        T: PartialOrd + SampleUniform,
         Standard: Distribution<T>,
     {
-        let cfg_str: String = fs::read_to_string(config_path)?;
-        let config: EvolutionConfig<T> = serde_yaml::from_str(&cfg_str)?;
         let population = Population::initial_with_range(
             config.pop_size,
             config.individual_length,
@@ -142,23 +126,12 @@ where
     }
 }
 
-use serde::{Deserialize, Serialize};
-
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-pub struct EvolutionConfig<T> {
-    pop_size: usize,
-    elite_size: usize,
-    mutation_rate: f32,
-    generations: usize,
-    individual_length: usize,
-    upper: Option<T>,
-    lower: Option<T>,
-}
-
-pub struct Population<T> {
+struct Population<T> {
     individuals: Vec<Individual<T>>,
     status: PopulationStatus,
 }
+
+use std::iter::repeat_with;
 
 impl<T> Population<T>
 where
@@ -169,13 +142,15 @@ where
         T: SampleUniform + PartialOrd,
         Standard: Distribution<T>,
     {
-        let mut individuals = Vec::with_capacity(pop_size);
-        for _ in 0..pop_size {
-            individuals.push(Individual::<T>::rand_with_bound(length, upper, lower));
-        }
-
+        let mut rng = thread_rng();
         Population {
-            individuals,
+            individuals: repeat_with(|| Individual {
+                genes: repeat_with(|| rng.gen_range(lower..upper))
+                    .take(length)
+                    .collect(),
+            })
+            .take(pop_size)
+            .collect(),
             status: PopulationStatus::Initialized,
         }
     }
@@ -183,13 +158,12 @@ where
     where
         Standard: Distribution<T>,
     {
-        let mut individuals = Vec::with_capacity(pop_size);
-        for _ in 0..pop_size {
-            individuals.push(Individual::<T>::rand(length));
-        }
-
         Population {
-            individuals,
+            individuals: repeat_with(|| Individual {
+                genes: repeat_with(|| rand::random::<T>()).take(length).collect(),
+            })
+            .take(pop_size)
+            .collect(),
             status: PopulationStatus::Initialized,
         }
     }
@@ -291,4 +265,3 @@ where
     }
 }
 mod error;
-pub type GaResult<T> = std::result::Result<T, error::GaError>;

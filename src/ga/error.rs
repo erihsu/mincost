@@ -8,14 +8,4 @@ pub enum GaError {
     MutateBeforeBreed,
     #[error("Best DeciIndividuals Not generated")]
     BestDeciIndividualNotReady,
-    #[error("Failed to parse ga config")]
-    InvalidGaConfig {
-        #[from]
-        source: serde_yaml::Error,
-    },
-    #[error("Not found config yaml")]
-    ConfigNotFound {
-        #[from]
-        source: std::io::Error,
-    },
 }

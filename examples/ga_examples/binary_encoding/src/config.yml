@@ -1,7 +1,0 @@
-pop_size: 100
-elite_size: 20
-mutation_rate: 0.1
-generations: 20
-individual_length: 10
-
-
