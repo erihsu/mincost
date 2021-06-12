@@ -1,5 +1,5 @@
 # MinCost
-A collection of modern heuristic optimization framework in Rust.
+A collection of modern heuristic optimization framework designed to easily embed into your Rust project.
 
 ## Overwiew
 
@@ -7,7 +7,7 @@ A collection of modern heuristic optimization framework in Rust.
 
 2. Simulated Annealing
 
-3. Particle Swarm(TODO)
+3. Particle Swarm
 
 4. Tabu Search(TODO)
 
@@ -22,9 +22,9 @@ A collection of modern heuristic optimization framework in Rust.
 
   In mincost, you can encode your solution with various way. ie, in i8, i16, i32 and even boolean.
 
-* Initialize population by custom randness
+* Initialize solution by custom randness
 
-  The population can be initialized by your custom randomization strategy. Refer to [examples](examples/ga_examples)
+  The solution can be initialized by your custom randomization strategy by closure. Refer to [examples](examples/ga_examples)
 
 
 
