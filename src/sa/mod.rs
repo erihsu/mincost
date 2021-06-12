@@ -2,56 +2,18 @@
 /// Simulated Annealing Algorithm in Rust
 use std::fmt::Debug;
 
-pub trait Solution: Clone + Debug {
-    fn fitness(&self) -> f32;
-    // rand solution
-    fn rand() -> Self;
-    // random neighbor solution
-    fn neighbor(&self) -> Self;
+// encoded solution
+#[derive(Clone, Debug)]
+pub struct Solution<T> {
+    bits: Vec<T>,
 }
 
-pub struct AnnealState<S>
-where
-    S: Solution,
-{
-    solution: S,
+pub struct AnnealState<T> {
+    solution: Solution<T>,
     temperature: f32,
 }
 
-impl<S> AnnealState<S>
-where
-    S: Solution,
-{
-    fn initial(config: &AnnealerConfig) -> Self {
-        let temperature = config.temperature_zero;
-        let solution = S::rand();
-        AnnealState {
-            solution,
-            temperature,
-        }
-    }
-
-    fn update_temperature(&mut self, config: &AnnealerConfig) {
-        self.temperature *= config.alpha;
-    }
-
-    // possibility to acceptance neighbor solution
-    fn acceptance(&mut self) {
-        let neighbor = self.solution.neighbor();
-        let delta = neighbor.fitness() - self.solution.fitness();
-        if delta < 0.0 {
-            self.solution = neighbor;
-        } else {
-            if rand::random::<f32>() < (-delta.abs() / self.temperature).exp() {
-                self.solution = neighbor;
-            }
-        }
-    }
-}
-
-use serde::{Deserialize, Serialize};
-
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq)]
 pub struct AnnealerConfig {
     alpha: f32,
     temperature_zero: f32,
@@ -59,24 +21,79 @@ pub struct AnnealerConfig {
     iteration: usize,
 }
 
-pub struct Annealer<S: Solution> {
+pub struct Annealer<T, F> {
     config: AnnealerConfig,
-    state: AnnealState<S>,
+    state: AnnealState<T>,
+    fitness: F,
 }
 
-use std::{fs, path::Path};
-impl<S: Solution> Annealer<S> {
-    fn init<P: AsRef<Path>>(config_path: P) -> SaResult<Self> {
-        let cfg_str: String = fs::read_to_string(config_path)?;
-        let config: AnnealerConfig = serde_yaml::from_str(&cfg_str)?;
-        let state = AnnealState::<S>::initial(&config);
-        Ok(Annealer { config, state })
+impl<T> Solution<T>
+where
+    T: Copy,
+{
+    fn neighbor(&self) -> Self {
+        let mut new_solution = self.clone();
+        let idx1: usize = fastrand::usize(..new_solution.bits.len());
+        let idx2: usize = fastrand::usize(..new_solution.bits.len());
+        let tmp = &mut new_solution.bits[idx1].clone();
+        new_solution.bits[idx1] = new_solution.bits[idx2].clone();
+        new_solution.bits[idx2] = *tmp;
+        new_solution
     }
+}
+use std::ops::*;
+impl<T> AnnealState<T>
+where
+    T: Copy,
+{
+    fn initial_random_state<R: Fn() -> Solution<T>>(randness: R, temp0: f32) -> Self {
+        AnnealState {
+            solution: randness(),
+            temperature: temp0,
+        }
+    }
+    fn update_temperature(&mut self, alpha: f32) {
+        self.temperature *= alpha;
+    }
+    // possibility to acceptance neighbor solution
+    fn acceptance<O: PartialOrd + Into<f32> + Sub<Output = O>>(
+        &mut self,
+        fitness: &dyn Fn(&Solution<T>) -> O,
+    ) {
+        let neighbor = self.solution.neighbor();
+        let delta: f32 = (fitness(&neighbor) - fitness(&self.solution)).into();
+        if delta < 0.0 {
+            self.solution = neighbor;
+        } else {
+            if fastrand::f32() < (-delta.abs() / self.temperature).exp() {
+                self.solution = neighbor;
+            }
+        }
+    }
+}
 
-    fn anneal(&mut self) -> SaResult<S> {
+impl<T, F, O> Annealer<T, F>
+where
+    F: Fn(&Solution<T>) -> O,
+    O: PartialOrd + Into<f32> + Sub + Sub<Output = O>,
+    T: Copy + Debug,
+{
+    fn init<R: Fn() -> Solution<T>>(
+        config: AnnealerConfig,
+        fitness: F,
+        randness: R,
+    ) -> SaResult<Self> {
+        let state = AnnealState::initial_random_state(randness, config.temperature_zero);
+        Ok(Annealer {
+            config,
+            state,
+            fitness,
+        })
+    }
+    fn anneal(&mut self) -> SaResult<Solution<T>> {
         for _ in 0..self.config.iteration {
             if self.state.temperature >= self.config.temperature_end {
-                self.state.acceptance();
+                self.state.acceptance(&self.fitness);
             } else {
                 break;
             }

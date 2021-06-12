@@ -8,3 +8,4 @@ edition = "2018"
 
 [dependencies]
 mincost = {path = "../../../../mincost",features = ["ga"]}
+rand = "0.8"

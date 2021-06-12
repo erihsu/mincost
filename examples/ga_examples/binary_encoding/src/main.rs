@@ -2,6 +2,13 @@ use mincost::{Evolution, EvolutionConfig, Individual};
 fn main() {
     // define Fitness as well as encoding type.
     // In this example, encoding type is Boolean
+    // define randness strategy
+    let randness = || -> Individual<bool> {
+        Individual {
+            genes: repeat_with(|| rand::random::<bool>()).take(10).collect(),
+        }
+    };
+
     let fitness = |solution: &Individual<bool>| -> i32 {
         let weight: Vec<i32> = (-5..5).collect();
         solution.genes.iter().zip(weight).fold(0, |acc, (g, w)| {
@@ -14,11 +21,8 @@ fn main() {
         elite_size: 20,
         mutation_rate: 0.4,
         generations: 10,
-        individual_length: 5,
-        upper: None,
-        lower: None,
     };
-    let mut evolution = Evolution::init(evolution_config, fitness).unwrap();
+    let mut evolution = Evolution::init(evolution_config, fitness, randness).unwrap();
     let best_ind = evolution.evolute().unwrap();
     println!("Best Individual {:?}", best_ind);
 }

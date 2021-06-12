@@ -5,7 +5,7 @@ A collection of modern heuristic optimization framework in Rust.
 
 1. Genetic Algorithm
 
-2. Simulated Annealing(TODO)
+2. Simulated Annealing
 
 3. Particle Swarm(TODO)
 
@@ -22,10 +22,9 @@ A collection of modern heuristic optimization framework in Rust.
 
   In mincost, you can encode your solution with various way. ie, in i8, i16, i32 and even boolean.
 
-* Bounded solution
+* Initialize population by custom randness
 
-  In most combinational optimization problems, the solution is encoded as integer with lower-upper bounded. 
-  mincost allows to configurate as bounded solution. Refer to [examples](examples/ga_examples)
+  The population can be initialized by your custom randomization strategy. Refer to [examples](examples/ga_examples)
 
 
 
