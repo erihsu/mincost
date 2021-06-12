@@ -1,5 +1,5 @@
 # MinCost
-A collection of modern heuristic optimization framework designed to easily embed into your Rust project.
+A collection of modern heuristic optimization toolkit.
 
 ## Overwiew
 
@@ -18,15 +18,13 @@ A collection of modern heuristic optimization framework designed to easily embed
 
   This is the primary design goal of mincost. See how to embed generic algorithm into your Rust project, please refer to [examples](examples/ga_examples)
 
-* Various way to encoding your solution
+* Flexiable encoding style
 
-  In mincost, you can encode your solution with various way. ie, in i8, i16, i32 and even boolean.
+  In mincost, you can encode your solution with various style. ie, in i32, i16, i8 and even boolean.
 
 * Initialize solution by custom randness
 
   The solution can be initialized by your custom randomization strategy by closure. Refer to [examples](examples/ga_examples)
-
-
 
 ## License
 
@@ -37,5 +35,6 @@ Licensed under either of these:
  * MIT license ([LICENSE-MIT](LICENSE-MIT) or
    https://opensource.org/licenses/MIT)
 
+The project is in the early stage of construction, especially docs && examples.
 
 
