@@ -1,23 +1,64 @@
-//! Generic Algorithm Framework
+//! Genetic Algorithm Framework
+//!
+//! Four steps to construct generic algorithm
+//!
+//! 1. Give hyper parameter in GA
+//! ``` rust
+//! let config = EvolutionConfig {...}
+//! ```
+
+//! 2. Define individual encoding and its randomization
+//! ``` rust
+//! use std::iter::repeat_with;
+//! let randness = || -> Individual<bool> {
+//!     Individual {
+//!         genes: repeat_with(|| rand::random::<bool>()).take(10).collect(),
+//!     }
+//! };
+//! ```
+//! 3. Define fitness function by closure
+//! ``` rust
+//! let fitness = |solution: &Individual<bool>| -> f32 {
+//!     ...
+//! };
+//! ```
+//! 4. Construct genetic algorithm
+//! ``` rust
+//! let mut evolution = Evolution::init(config, fitness, randness);
+//! ```
+
+//! Finally, run the process to get the optimized solution
+//! ``` rust
+//! let best_ind = evolution.evolute();
+//! ```
+
+//! Learn more from the [examples](examples/ga_examples)
 use std::fmt::Debug;
 
+/// generic individual to support various encoding style
 #[derive(Clone, Debug)]
 pub struct Individual<T> {
+    /// genes in the individual
     pub genes: Vec<T>,
 }
 
+/// evolution body
 pub struct Evolution<T, F> {
     config: EvolutionConfig,
     population: Population<T>,
     fitness: F,
 }
 
-// hyper parameter in generic algorithm
+/// hyper parameter in genetic algorithm
 #[derive(Debug, PartialEq)]
 pub struct EvolutionConfig {
+    /// population size
     pub pop_size: usize,
+    /// elite size
     pub elite_size: usize,
+    /// mutattion rate, in 0 to 1
     pub mutation_rate: f32,
+    /// evolution generation number
     pub generations: usize,
 }
 
@@ -67,7 +108,7 @@ where
     O: PartialOrd + Into<f64>,
     T: Copy + Debug,
 {
-    // initial envolution, including population and evolution hyper parameter
+    /// initial envolution, including population and evolution hyper parameter
     pub fn init<R: Fn() -> Individual<T>>(
         config: EvolutionConfig,
         fitness: F,

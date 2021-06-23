@@ -3,6 +3,13 @@ use rand::{thread_rng, Rng};
 use std::iter::repeat_with;
 
 fn main() {
+    // give hyper parameter in ga
+    let evolution_config = EvolutionConfig {
+        pop_size: 100,
+        elite_size: 20,
+        mutation_rate: 0.1,
+        generations: 20,
+    };
     // define randness strategy
     let randness = || -> Individual<i32> {
         let mut rng = thread_rng();
@@ -20,13 +27,7 @@ fn main() {
         });
         sum as f32
     };
-    // hyper parameter in ga
-    let evolution_config = EvolutionConfig {
-        pop_size: 100,
-        elite_size: 20,
-        mutation_rate: 0.1,
-        generations: 20,
-    };
+    // construct ga
     let mut evolution = Evolution::init(evolution_config, fitness, randness);
     let best_ind = evolution.evolute();
     println!("Best DeciIndividual {:?}", best_ind);

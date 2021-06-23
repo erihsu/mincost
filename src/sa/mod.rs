@@ -1,4 +1,5 @@
 //! Simulated Annealing Framework
+#![allow(dead_code)]
 use std::fmt::Debug;
 
 // encoded solution

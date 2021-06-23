@@ -14,9 +14,9 @@ A collection of modern heuristic optimization toolkit.
 
 ## Features
 
-* Easy to Embed
+* Easy to embed
 
-  This is the primary design goal of mincost. See how to embed generic algorithm into your Rust project, please refer to [examples](examples/ga_examples)
+  This is the primary design goal of mincost. See how to embed genetic algorithm into your Rust project, please refer to [examples](examples/ga_examples)
 
 * Flexiable encoding style
 
