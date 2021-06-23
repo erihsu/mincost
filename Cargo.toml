@@ -13,6 +13,7 @@ keywords = ["heuristic","generic-algorithm","simulated-annealing","particle-swar
 fastrand = "1.4"
 
 [features]
+default = ["ga","sa","pso"]
 ga = []
 sa = []
 pso = []

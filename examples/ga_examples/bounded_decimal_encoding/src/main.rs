@@ -27,7 +27,7 @@ fn main() {
         mutation_rate: 0.1,
         generations: 20,
     };
-    let mut evolution = Evolution::init(evolution_config, fitness, randness).unwrap();
-    let best_ind = evolution.evolute().unwrap();
+    let mut evolution = Evolution::init(evolution_config, fitness, randness);
+    let best_ind = evolution.evolute();
     println!("Best DeciIndividual {:?}", best_ind);
 }

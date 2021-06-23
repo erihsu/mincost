@@ -1,4 +1,4 @@
-///! Simulated Annealing Framework
+//! Simulated Annealing Framework
 use std::fmt::Debug;
 
 // encoded solution

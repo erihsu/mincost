@@ -1,4 +1,4 @@
-///! Particle Swarm Optimization Framework
+//! Particle Swarm Optimization Framework
 use std::fmt::Debug;
 use std::iter::repeat_with;
 

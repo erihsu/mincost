@@ -1,4 +1,5 @@
 use mincost::{Evolution, EvolutionConfig, Individual};
+use std::iter::repeat_with;
 fn main() {
     // define Fitness as well as encoding type.
     // In this example, encoding type is Boolean
@@ -23,6 +24,6 @@ fn main() {
         generations: 10,
     };
     let mut evolution = Evolution::init(evolution_config, fitness, randness);
-    let best_ind = evolution.evolute().unwrap();
+    let best_ind = evolution.evolute();
     println!("Best Individual {:?}", best_ind);
 }

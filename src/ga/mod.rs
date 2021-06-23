@@ -1,4 +1,4 @@
-///! Generic Algorithm Framework
+//! Generic Algorithm Framework
 use std::fmt::Debug;
 
 #[derive(Clone, Debug)]
