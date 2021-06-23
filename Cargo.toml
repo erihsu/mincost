@@ -7,7 +7,7 @@ description = "A collection of modern heuristic optimization toolkit"
 license = "MIT OR Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/erihsu/mincost"
-keywords = ["heuristic","generic algorithm","simulated annealing","particle swarm"]
+keywords = ["heuristic","generic-algorithm","simulated-annealing","particle-swarm"]
 
 [dependencies]
 fastrand = "1.4"
