@@ -1,9 +1,9 @@
-/// A collection of modern heuristic optimization algorithm written in Rust.
-// #[cfg(feature = "ga")]
+///! A collection of modern heuristic optimization toolkit.
+#[cfg(feature = "ga")]
 pub mod ga;
-// #[cfg(feature = "pso")]
+#[cfg(feature = "pso")]
 pub mod pso;
-// #[cfg(feature = "sa")]
+#[cfg(feature = "sa")]
 pub mod sa;
 
 #[cfg(feature = "ga")]

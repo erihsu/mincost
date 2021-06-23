@@ -1,9 +1,5 @@
-#![allow(dead_code)]
-use self::error::GaError;
-/// Generic Algorithm in Rust
+///! Generic Algorithm Framework
 use std::fmt::Debug;
-
-pub type GaResult<T> = std::result::Result<T, error::GaError>;
 
 #[derive(Clone, Debug)]
 pub struct Individual<T> {
@@ -16,7 +12,7 @@ pub struct Evolution<T, F> {
     fitness: F,
 }
 
-// hyper parameter
+// hyper parameter in generic algorithm
 #[derive(Debug, PartialEq)]
 pub struct EvolutionConfig {
     pub pop_size: usize,
@@ -29,6 +25,7 @@ impl<T> Individual<T>
 where
     T: Copy + Debug,
 {
+    // breed
     fn breed(&self, another: &Self) -> Self {
         let idx1: usize = fastrand::usize(..self.genes.len());
         let idx2: usize = fastrand::usize(..self.genes.len());
@@ -54,6 +51,7 @@ where
     }
 }
 
+// internal state of population evolution
 #[derive(PartialEq)]
 enum PopulationStatus {
     Initialized,
@@ -69,30 +67,31 @@ where
     O: PartialOrd + Into<f64>,
     T: Copy + Debug,
 {
+    // initial envolution, including population and evolution hyper parameter
     pub fn init<R: Fn() -> Individual<T>>(
         config: EvolutionConfig,
         fitness: F,
         randness: R,
-    ) -> GaResult<Self> {
+    ) -> Self {
         let population = Population::initial_random_pop(config.pop_size, randness);
-        Ok(Evolution {
+        Evolution {
             config,
             population,
             fitness,
-        })
+        }
     }
-    fn next_generation(&mut self) -> GaResult<Population<T>> {
+    // generate next iteration
+    fn next_generation(&mut self) -> Population<T> {
         self.population.rank(&self.fitness);
-        let mut breeded = self
-            .population
-            .selection(&self.config, &self.fitness)
-            .and_then(|mut x| x.breed(&self.config))?;
-        let _ = breeded.mutate(&self.config)?;
-        Ok(breeded)
+        let mut selected = self.population.selection(&self.config, &self.fitness);
+        let mut breeded = selected.breed(&self.config);
+        breeded.mutate(&self.config);
+        breeded
     }
-    pub fn evolute(&mut self) -> GaResult<Individual<T>> {
+    // the top evolution
+    pub fn evolute(&mut self) -> Individual<T> {
         for _ in 0..self.config.generations {
-            let next_gen: Population<T> = self.next_generation()?;
+            let next_gen: Population<T> = self.next_generation();
             self.population = next_gen;
         }
         self.population.best_individual()
@@ -110,6 +109,7 @@ impl<T> Population<T>
 where
     T: Copy + Debug,
 {
+    // initial random population
     fn initial_random_pop<R: Fn() -> Individual<T>>(pop_size: usize, randness: R) -> Self {
         Population {
             individuals: repeat_with(|| randness()).take(pop_size).collect(),
@@ -122,11 +122,12 @@ where
             .sort_by(|a, b| fitness(a).partial_cmp(&fitness(b)).unwrap());
         self.status = PopulationStatus::Ranked;
     }
+    // individual selection within popultion
     fn selection<O: PartialOrd>(
         &mut self,
         config: &EvolutionConfig,
         fitness: &dyn Fn(&Individual<T>) -> O,
-    ) -> GaResult<Self>
+    ) -> Self
     where
         O: PartialOrd + Into<f64>,
     {
@@ -156,16 +157,16 @@ where
                     }
                 }
             }
-            Ok(Population {
+            Population {
                 individuals: selected,
                 status: PopulationStatus::Selected,
-            })
+            }
         } else {
-            Err(GaError::SelectionBeforeRank)
+            unreachable!()
         }
     }
-
-    fn breed(&mut self, config: &EvolutionConfig) -> GaResult<Self> {
+    // individual breed within population
+    fn breed(&mut self, config: &EvolutionConfig) -> Self {
         let mut child = Vec::with_capacity(config.pop_size);
         if self.status == PopulationStatus::Selected {
             // keep elite from selected result
@@ -179,16 +180,16 @@ where
                 let p2 = &self.individuals[config.pop_size - i - 1];
                 child.push(p1.breed(&p2));
             }
-            Ok(Population {
+            Population {
                 individuals: child,
                 status: PopulationStatus::Breeded,
-            })
+            }
         } else {
-            Err(GaError::BreedBeforeSelection)
+            unreachable!()
         }
     }
-
-    fn mutate(&mut self, config: &EvolutionConfig) -> GaResult<()> {
+    // mutation within population
+    fn mutate(&mut self, config: &EvolutionConfig) {
         if self.status == PopulationStatus::Breeded {
             for ind in self.individuals.iter_mut() {
                 if fastrand::f32() < config.mutation_rate {
@@ -196,18 +197,16 @@ where
                 }
             }
             self.status = PopulationStatus::Mutated;
-            Ok(())
         } else {
-            Err(GaError::MutateBeforeBreed)
+            unreachable!()
         }
     }
-
-    fn best_individual(&self) -> GaResult<Individual<T>> {
+    // choose the best individual from population
+    fn best_individual(&self) -> Individual<T> {
         if self.status == PopulationStatus::Mutated {
-            Ok(self.individuals[0].clone())
+            self.individuals[0].clone()
         } else {
-            Err(GaError::BestDeciIndividualNotReady)
+            unreachable!()
         }
     }
 }
-mod error;

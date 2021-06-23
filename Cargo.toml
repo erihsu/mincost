@@ -1,16 +1,16 @@
 [package]
 name = "mincost"
 version = "0.1.0"
-authors = ["Eric <zhenyuxu163@163.com>"]
+authors = ["Eric <xuzhenyutc@icloud.com>"]
 edition = "2018"
 
 [dependencies]
 fastrand = "1.4"
-thiserror = "1.0"
 
 [features]
 ga = []
 sa = []
+pso = []
 
 [workspace]
 members = [

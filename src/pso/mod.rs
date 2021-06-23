@@ -1,3 +1,4 @@
+///! Particle Swarm Optimization Framework
 use std::fmt::Debug;
 use std::iter::repeat_with;
 
@@ -84,30 +85,23 @@ where
     O: PartialOrd,
     T: Copy + Debug + AddAssign + Sub + std::ops::Sub<Output = T> + From<f32> + Into<f32>,
 {
-    pub fn init<R: Fn() -> Particle<T>>(
-        config: PsoConfig,
-        fitness: F,
-        randness: R,
-    ) -> PsoResult<Self>
+    pub fn init<R: Fn() -> Particle<T>>(config: PsoConfig, fitness: F, randness: R) -> Self
     where
         F: Fn(&Particle<T>) -> O,
         O: Into<f64>,
     {
         let swarm = Swarm::initial_random_pop(config.pop_size, randness);
-        Ok(PsOpt {
+        PsOpt {
             swarm,
             fitness,
             config,
-        })
+        }
     }
-    pub fn optimize(&mut self) -> PsoResult<Solution<T>> {
+    pub fn optimize(&mut self) -> Solution<T> {
         // reach iteration number as termination criterion
         for _ in 0..self.config.iteration {
             self.swarm.update_swarm(&self.config, &self.fitness);
         }
-        Ok(self.swarm.best_known_position.clone())
+        self.swarm.best_known_position.clone()
     }
 }
-
-mod error;
-pub type PsoResult<T> = std::result::Result<T, self::error::PsoError>;

@@ -22,7 +22,7 @@ fn main() {
         mutation_rate: 0.4,
         generations: 10,
     };
-    let mut evolution = Evolution::init(evolution_config, fitness, randness).unwrap();
+    let mut evolution = Evolution::init(evolution_config, fitness, randness);
     let best_ind = evolution.evolute().unwrap();
     println!("Best Individual {:?}", best_ind);
 }

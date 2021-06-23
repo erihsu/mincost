@@ -1,5 +1,4 @@
-#![allow(dead_code)]
-/// Simulated Annealing Algorithm in Rust
+///! Simulated Annealing Framework
 use std::fmt::Debug;
 
 // encoded solution
@@ -78,19 +77,15 @@ where
     O: PartialOrd + Into<f32> + Sub + Sub<Output = O>,
     T: Copy + Debug,
 {
-    fn init<R: Fn() -> Solution<T>>(
-        config: AnnealerConfig,
-        fitness: F,
-        randness: R,
-    ) -> SaResult<Self> {
+    fn init<R: Fn() -> Solution<T>>(config: AnnealerConfig, fitness: F, randness: R) -> Self {
         let state = AnnealState::initial_random_state(randness, config.temperature_zero);
-        Ok(Annealer {
+        Annealer {
             config,
             state,
             fitness,
-        })
+        }
     }
-    fn anneal(&mut self) -> SaResult<Solution<T>> {
+    fn anneal(&mut self) -> Solution<T> {
         for _ in 0..self.config.iteration {
             if self.state.temperature >= self.config.temperature_end {
                 self.state.acceptance(&self.fitness);
@@ -98,8 +93,6 @@ where
                 break;
             }
         }
-        Ok(self.state.solution.clone())
+        self.state.solution.clone()
     }
 }
-mod error;
-pub type SaResult<T> = std::result::Result<T, self::error::SaError>;
