@@ -1,6 +1,6 @@
 [package]
 name = "mincost"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Eric <xuzhenyutc@icloud.com>"]
 edition = "2018"
 description = "A collection of modern heuristic optimization toolkit"
@@ -13,13 +13,18 @@ keywords = ["heuristic","genetic-algorithm","simulated-annealing","particle-swar
 fastrand = "1.4"
 
 [features]
-default = ["ga","sa","pso"]
+default = ["ga","sa","pso","normal"]
 ga = []
 sa = []
 pso = []
+shuffle = []
+normal = []
 
 [workspace]
 members = [
 	"examples/ga_examples/bounded_decimal_encoding",
+	"examples/ga_examples/tsp-ga",
 	"examples/ga_examples/binary_encoding",
+	"examples/sa_examples/tsp-sa",
+	"examples/pso_examples/tsp-pso",
 ]

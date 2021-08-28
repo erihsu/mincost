@@ -64,10 +64,10 @@ pub struct EvolutionConfig {
 
 impl<T> Individual<T>
 where
-    T: Copy + Debug,
+    T: Copy + Debug + std::cmp::PartialEq,
 {
-    // breed
-    fn breed(&self, another: &Self) -> Self {
+    // breed1, default breed method.
+    fn breed1(&self, another: &Self) -> Self {
         let idx1: usize = fastrand::usize(..self.genes.len());
         let idx2: usize = fastrand::usize(..self.genes.len());
         let start_gene_idx = std::cmp::min(idx1, idx2);
@@ -79,6 +79,24 @@ where
         ]
         .concat(); // slice concating
         child_p2.extend(child_p1);
+        Individual { genes: child_p2 }
+    }
+    // breed2, special breed method. It ensures the child's gene bit is non-duplicated with each other
+    fn breed2(&self, another: &Self) -> Self {
+        let idx1: usize = fastrand::usize(..self.genes.len());
+        let idx2: usize = fastrand::usize(..self.genes.len());
+        let start_gene_idx = std::cmp::min(idx1, idx2);
+        let end_gene_idx = std::cmp::max(idx1, idx2);
+        let child_p1 = &self.genes[start_gene_idx..end_gene_idx];
+        let mut child_p2 = vec![];
+
+        for g in &another.genes {
+            if !child_p1.contains(g) {
+                child_p2.push(*g);
+            }
+        }
+        child_p2.extend(child_p1);
+        assert_eq!(child_p2.len(), self.genes.len());
         Individual { genes: child_p2 }
     }
     // self-mutated
@@ -106,7 +124,7 @@ impl<T, F, O> Evolution<T, F>
 where
     F: Fn(&Individual<T>) -> O,
     O: PartialOrd + Into<f64>,
-    T: Copy + Debug,
+    T: Copy + Debug + std::cmp::PartialEq,
 {
     /// initial envolution, including population and evolution hyper parameter
     pub fn init<R: Fn() -> Individual<T>>(
@@ -148,7 +166,7 @@ use std::iter::repeat_with;
 
 impl<T> Population<T>
 where
-    T: Copy + Debug,
+    T: Copy + Debug + std::cmp::PartialEq,
 {
     // initial random population
     fn initial_random_pop<R: Fn() -> Individual<T>>(pop_size: usize, randness: R) -> Self {
@@ -219,7 +237,11 @@ where
                 // parents
                 let p1 = &self.individuals[i];
                 let p2 = &self.individuals[config.pop_size - i - 1];
-                child.push(p1.breed(&p2));
+                if cfg!(feature = "breed2") {
+                    child.push(p1.breed2(&p2));
+                } else if cfg!(feature = "breed1") {
+                    child.push(p1.breed1(&p2));
+                }
             }
             Population {
                 individuals: child,
