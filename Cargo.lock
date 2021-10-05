@@ -61,7 +61,7 @@ checksum = "12b8adadd720df158f4d70dfe7ccc6adb0472d7c55ca83445f6a5ab3e36f8fb6"
 
 [[package]]
 name = "mincost"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "fastrand",
 ]
@@ -113,7 +113,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "tsp"
+name = "tsp-ga"
+version = "0.1.0"
+dependencies = [
+ "mincost",
+ "rand",
+]
+
+[[package]]
+name = "tsp-pso"
 version = "0.1.0"
 dependencies = [
  "mincost",
