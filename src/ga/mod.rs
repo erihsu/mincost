@@ -50,7 +50,7 @@ pub struct Evolution<T, F> {
 }
 
 /// hyper parameter in genetic algorithm
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub struct EvolutionConfig {
     /// population size
     pub pop_size: usize,

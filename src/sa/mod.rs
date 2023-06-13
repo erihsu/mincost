@@ -13,7 +13,7 @@ pub struct AnnealState<T> {
     temperature: f32,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub struct AnnealerConfig {
     pub alpha: f32,
     pub temperature_zero: f32,

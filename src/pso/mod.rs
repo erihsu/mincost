@@ -32,7 +32,7 @@ pub struct PsOpt<T, F> {
     config: PsoConfig,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct PsoConfig {
     pop_size: usize,
     omega: f32, // w
